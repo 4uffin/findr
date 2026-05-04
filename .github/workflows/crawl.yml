@@ -1,4 +1,4 @@
-name: findr-spider-update
+name: findr-spider
 on:
   schedule:
     - cron: '0 0 * * *' # Triggered once daily at midnight UTC
