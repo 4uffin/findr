@@ -1,0 +1,26 @@
+name: findr-spider-update
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+concurrency:
+  group: "spider-crawl"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Install
+        run: pip install requests beautifulsoup4
+      - name: Crawl
+        run: python findr_spider.py
+      - name: Push
+        run: |
+          git config --global user.name "findr-bot"
+          git config --global user.email "bot@findr.search"
+          git add index/*.json
+          git commit -m "Update index: $(date +'%Y-%m-%d %I:%M %p')" || exit 0
+          git push
