@@ -5,87 +5,125 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>findr</title>
     <style>
-        /* Minimalist 2005-era aesthetic */
-        body { font-family: Arial, sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; background: #fff; color: #202124; }
-        .container { margin-top: 15vh; width: 90%; max-width: 600px; text-align: center; }
-        .logo { font-size: 80px; font-weight: 700; margin-bottom: 30px; letter-spacing: -4px; }
-        .logo span { color: #4285f4; }
-        input { width: 100%; padding: 12px 20px; font-size: 16px; border: 1px solid #dfe1e5; border-radius: 24px; outline: none; box-sizing: border-box; }
+        :root { --blue: #4285f4; --border: #dfe1e5; --main-text: #202124; --sub-text: #4d5156; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; background: #fff; color: var(--main-text); }
+        .container { margin-top: 12vh; display: flex; flex-direction: column; align-items: center; width: 100%; }
+        
+        /* 2005-era Professional Branding */
+        .logo { font-size: 72px; font-weight: 800; margin-bottom: 25px; letter-spacing: -5px; font-family: 'Arial Black', sans-serif; }
+        .logo span { color: var(--blue); }
+        
+        .search-wrapper { width: 90%; max-width: 580px; }
+        input { 
+            width: 100%; padding: 14px 22px; font-size: 16px; 
+            border: 1px solid var(--border); border-radius: 24px; 
+            outline: none; transition: box-shadow 0.2s; box-sizing: border-box;
+        }
         input:focus { box-shadow: 0 1px 6px rgba(32,33,36,0.28); }
-        .btns { margin-top: 20px; }
-        button { background: #f8f9fa; border: 1px solid #f8f9fa; padding: 10px 20px; margin: 5px; cursor: pointer; border-radius: 4px; }
-        #results { width: 100%; max-width: 650px; margin-top: 30px; text-align: left; }
-        .item { margin-bottom: 25px; }
-        .item a { color: #1a0dab; font-size: 20px; text-decoration: none; }
-        .item p { color: #4d5156; font-size: 14px; margin: 5px 0; }
+        
+        .btns { margin-top: 25px; }
+        button { 
+            background: #f8f9fa; border: 1px solid #f8f9fa; padding: 10px 18px; 
+            margin: 0 6px; cursor: pointer; border-radius: 4px; font-size: 14px; 
+        }
+        button:hover { border: 1px solid #dadce0; }
+        
+        #stats { font-size: 13px; color: var(--sub-text); margin-top: 15px; height: 18px; width: 90%; max-width: 650px; text-align: left; }
+        #results { width: 90%; max-width: 650px; margin-top: 20px; }
+        
+        .item { margin-bottom: 28px; }
+        .item a { color: #1a0dab; font-size: 19px; text-decoration: none; display: block; }
+        .item a:hover { text-decoration: underline; }
+        .item cite { color: #006621; font-style: normal; font-size: 14px; display: block; margin-bottom: 2px; }
+        .item p { color: var(--sub-text); font-size: 14px; line-height: 1.5; margin: 0; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1 class="logo">find<span>r</span></h1>
-        <input type="text" id="query" placeholder="Search..." autocomplete="off">
+        <div class="search-wrapper">
+            <input type="text" id="query" placeholder="Enter keywords..." autocomplete="off">
+        </div>
         <div class="btns">
             <button onclick="executeSearch()">findr Search</button>
             <button onclick="luckySearch()">I'm Feeling Lucky</button>
         </div>
+        <div id="stats"></div>
         <div id="results"></div>
     </div>
     <script>
-        /** Fetches shard and ranks results by relevance scoring */
+        /**
+         * Main search handler. Fetches the appropriate JSON shard and scores results locally.
+         */
         async function executeSearch() {
             const query = document.getElementById('query').value.trim().toLowerCase();
             const resDiv = document.getElementById('results');
+            const statsDiv = document.getElementById('stats');
             
             if (query.length < 2) return;
             resDiv.innerHTML = 'Searching...';
 
-            // Sharding logic: fetch file based on first letter
+            // Shard matching logic (a-z or 'others')
             const shard = /^[a-z]$/.test(query[0]) ? query[0] : 'others';
-            
             try {
                 const res = await fetch(`index/${shard}.json`);
                 const data = await res.json();
                 
-                // Rank and sort
+                // Map results to their scores, filter out non-matches, and sort by relevance
                 const filtered = data.map(i => ({...i, score: calculateScore(i, query)}))
                                      .filter(i => i.score > 0)
                                      .sort((a, b) => b.score - a.score);
-                
-                renderResults(filtered);
+                render(filtered);
                 return filtered;
             } catch (e) { 
                 resDiv.innerHTML = 'No results found.'; 
+                statsDiv.innerHTML = '';
             }
         }
 
-        /** Relevance Algorithm: Title > URL > Keywords > Description */
-        function calculateScore(item, q) {
+        /**
+         * Relevance Scoring Algorithm
+         * Priority: Exact Title Match > Partial Title Match > Description Match
+         */
+        function calculateScore(i, q) {
             let s = 0;
-            const t = item.title.toLowerCase();
-            if (t === q) s += 100; // Exact match
-            if (t.includes(q)) s += 20; // Partial title match
-            if (item.description.toLowerCase().includes(q)) s += 5;
+            const t = i.title.toLowerCase();
+            if (t === q) s += 100;
+            if (t.includes(q)) s += 20;
+            if (i.description.toLowerCase().includes(q)) s += 5;
             return s;
         }
 
-        function renderResults(list) {
+        /**
+         * Updates the DOM with the list of scored search results.
+         */
+        function render(list) {
             const resDiv = document.getElementById('results');
+            const statsDiv = document.getElementById('stats');
+            statsDiv.innerHTML = list.length ? `About ${list.length} results found` : '';
             resDiv.innerHTML = list.length ? '' : 'No results found.';
+            
             list.forEach(i => {
                 const d = document.createElement('div');
                 d.className = 'item';
-                d.innerHTML = `<a href="${i.url}">${i.title}</a><p>${i.description}</p>`;
+                d.innerHTML = `
+                    <a href="${i.url}">${i.title}</a>
+                    <cite>${i.url.substring(0, 80)}${i.url.length > 80 ? '...' : ''}</cite>
+                    <p>${i.description || 'No description available.'}</p>
+                `;
                 resDiv.appendChild(d);
             });
         }
 
-        /** Redirects directly to the highest scoring result */
+        /**
+         * "I'm Feeling Lucky" logic: Immediately redirects to the top result.
+         */
         async function luckySearch() {
             const r = await executeSearch();
             if (r && r.length) window.location.href = r[0].url;
         }
 
-        // Search on Enter key
+        // Trigger search on Enter key press
         document.getElementById('query').addEventListener('keypress', e => { 
             if(e.key === 'Enter') executeSearch(); 
         });
