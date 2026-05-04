@@ -1,9 +1,8 @@
-name: findr-spider
-
+name: findr-spider-update
 on:
   schedule:
-    - cron: '0 0 * * *' # Daily at 6PM MDT
-  workflow_dispatch: # Manual trigger enabled
+    - cron: '0 0 * * *' # Triggered once daily at midnight UTC
+  workflow_dispatch: # Enables manual triggering from the Actions UI
 
 concurrency:
   group: "spider-crawl"
@@ -19,7 +18,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           persist-credentials: true
 
-      - name: Set up Python
+      - name: Set up Python Environment
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -27,22 +26,25 @@ jobs:
       - name: Install Dependencies
         run: pip install requests beautifulsoup4
 
-      - name: Run findr Spider
+      - name: Execute Crawler
         run: python findr_spider.py
 
-      - name: Commit and Push Index
+      - name: Commit and Push Updated Index
         run: |
           git config --global user.name "findr-bot"
           git config --global user.email "bot@findr.search"
           
+          # Add the newly generated alphabetical JSON shards
           git add index/*.json
           
-          # Avoid empty commits
+          # Check for changes to avoid empty commits
           if git diff --staged --quiet; then
             echo "No changes to index."
             exit 0
           fi
           
           git commit -m "Update index: $(date +'%Y-%m-%d %I:%M %p')"
+          
+          # Use rebase to ensure local changes are applied on top of remote branch history
           git pull --rebase origin main
           git push
