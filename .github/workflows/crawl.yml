@@ -1,26 +1,57 @@
-name: findr-spider-update
+name: findr-spider
+
 on:
   schedule:
-    - cron: '0 0 * * *'
-  workflow_dispatch:
+    - cron: '0 0 * * *' # Runs at 6:00 PM MDT daily
+  workflow_dispatch: # Enables the manual "Run workflow" button
+
+# Prevents the bot from creating merge conflicts if two runs overlap
 concurrency:
   group: "spider-crawl"
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          # Uses the built-in token with the perms you enabled in settings
+          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-      - name: Install
-        run: pip install requests beautifulsoup4
-      - name: Crawl
+
+      - name: Install Dependencies
+        run: |
+          pip install requests beautifulsoup4
+
+      - name: Run findr Spider
         run: python findr_spider.py
-      - name: Push
+
+      - name: Commit and Push Index
         run: |
           git config --global user.name "findr-bot"
           git config --global user.email "bot@findr.search"
+          
+          # Stage the index shards
           git add index/*.json
-          git commit -m "Update index: $(date +'%Y-%m-%d %I:%M %p')" || exit 0
+          
+          # Only proceed if there are actually changes to the index
+          if git diff --staged --quiet; then
+            echo "No changes to index. Skipping push."
+            exit 0
+          fi
+          
+          git commit -m "Update index: $(date +'%Y-%m-%d %I:%M %p')"
+          
+          # Pull latest changes from main to ensure history matches
+          git pull --rebase origin main
+          
+          # Push the new shards back to GitHub
           git push
