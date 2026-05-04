@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>findr</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; background: #fff; color: #202124; }
+        .container { margin-top: 15vh; width: 90%; max-width: 600px; text-align: center; }
+        .logo { font-size: 80px; font-weight: 700; margin-bottom: 30px; letter-spacing: -4px; }
+        .logo span { color: #4285f4; }
+        input { width: 100%; padding: 12px 20px; font-size: 16px; border: 1px solid #dfe1e5; border-radius: 24px; outline: none; box-sizing: border-box; }
+        input:focus { box-shadow: 0 1px 6px rgba(32,33,36,0.28); }
+        .btns { margin-top: 20px; }
+        button { background: #f8f9fa; border: 1px solid #f8f9fa; padding: 10px 20px; margin: 5px; cursor: pointer; border-radius: 4px; }
+        #results { width: 100%; max-width: 650px; margin-top: 30px; text-align: left; }
+        .item { margin-bottom: 25px; }
+        .item a { color: #1a0dab; font-size: 20px; text-decoration: none; }
+        .item p { color: #4d5156; font-size: 14px; margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="logo">find<span>r</span></h1>
+        <input type="text" id="query" placeholder="Search..." autocomplete="off">
+        <div class="btns">
+            <button onclick="executeSearch()">findr Search</button>
+            <button onclick="luckySearch()">I'm Feeling Lucky</button>
+        </div>
+        <div id="results"></div>
+    </div>
+    <script>
+        async function executeSearch() {
+            const query = document.getElementById('query').value.trim().toLowerCase();
+            const resDiv = document.getElementById('results');
+            if (query.length < 2) return;
+            resDiv.innerHTML = 'Searching...';
+            const shard = /^[a-z]$/.test(query[0]) ? query[0] : 'others';
+            try {
+                const res = await fetch(`index/${shard}.json`);
+                const data = await res.json();
+                const filtered = data.map(i => ({...i, score: score(i, query)}))
+                                     .filter(i => i.score > 0)
+                                     .sort((a, b) => b.score - a.score);
+                render(filtered);
+                return filtered;
+            } catch (e) { resDiv.innerHTML = 'No results found.'; }
+        }
+        function score(i, q) {
+            let s = 0;
+            const t = i.title.toLowerCase();
+            if (t === q) s += 100;
+            if (t.includes(q)) s += 20;
+            if (i.description.toLowerCase().includes(q)) s += 5;
+            return s;
+        }
+        function render(list) {
+            const resDiv = document.getElementById('results');
+            resDiv.innerHTML = list.length ? '' : 'No results found.';
+            list.forEach(i => {
+                const d = document.createElement('div');
+                d.className = 'item';
+                d.innerHTML = `<a href="${i.url}">${i.title}</a><p>${i.description}</p>`;
+                resDiv.appendChild(d);
+            });
+        }
+        async function luckySearch() {
+            const r = await executeSearch();
+            if (r && r.length) window.location.href = r[0].url;
+        }
+        document.getElementById('query').addEventListener('keypress', e => { if(e.key === 'Enter') executeSearch(); });
+    </script>
+</body>
+</html>
