@@ -29,6 +29,9 @@ jobs:
       - name: Execute Crawler
         run: python findr_spider.py
 
+      - name: Track Indexing Statistics
+        run: python findr_stats.py
+
       - name: Commit and Push Updated Index
         run: |
           git config --global user.name "findr-bot"
@@ -37,13 +40,16 @@ jobs:
           # Add the newly generated alphabetical JSON shards
           git add index/*.json
           
+          # Add the updated statistics file
+          git add index_stats.json
+          
           # Check for changes to avoid empty commits
           if git diff --staged --quiet; then
-            echo "No changes to index."
+            echo "No changes to index or statistics."
             exit 0
           fi
           
-          git commit -m "Update index: $(date +'%Y-%m-%d %I:%M %p')"
+          git commit -m "Update index and stats: $(date +'%Y-%m-%d %I:%M %p')"
           
           # Use rebase to ensure local changes are applied on top of remote branch history
           git pull --rebase origin main
