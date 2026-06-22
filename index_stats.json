@@ -2,7 +2,7 @@
   "metadata": {
     "version": "1.0",
     "created_at": "2026-05-09T02:03:00.739105",
-    "last_updated": "2026-06-21T02:49:32.704405"
+    "last_updated": "2026-06-22T02:52:23.972748"
   },
   "crawl_sessions": [
     {
@@ -606,14 +606,28 @@
       "duration_seconds": 120,
       "ended_at": "2026-06-21T02:49:32.704388",
       "success_rate": 75.0
+    },
+    {
+      "id": "session_20260622_025223",
+      "started_at": "2026-06-22T02:52:23.972715",
+      "pages_indexed": 3,
+      "failed_count": 1,
+      "domains_crawled": {
+        "example.com": 2,
+        "github.com": 1,
+        "broken.com": 1
+      },
+      "duration_seconds": 120,
+      "ended_at": "2026-06-22T02:52:23.972735",
+      "success_rate": 75.0
     }
   ],
-  "total_pages_indexed": 129,
-  "total_crawl_time_seconds": 5160,
+  "total_pages_indexed": 132,
+  "total_crawl_time_seconds": 5280,
   "unique_domains": {
-    "example.com": 86,
-    "github.com": 43,
-    "broken.com": 43
+    "example.com": 88,
+    "github.com": 44,
+    "broken.com": 44
   },
   "success_rate": 75.0,
   "failed_urls": [
@@ -831,135 +845,140 @@
       "url": "https://broken.com/page",
       "error": "Timeout error",
       "timestamp": "2026-06-21T02:49:32.704384"
+    },
+    {
+      "url": "https://broken.com/page",
+      "error": "Timeout error",
+      "timestamp": "2026-06-22T02:52:23.972732"
     }
   ],
   "largest_domains": [
     {
       "domain": "example.com",
-      "count": 86
+      "count": 88
     },
     {
       "domain": "github.com",
-      "count": 43
+      "count": 44
     },
     {
       "domain": "broken.com",
-      "count": 43
+      "count": 44
     }
   ],
   "index_file_stats": {
     "total_shards": 27,
-    "total_entries": 2165,
+    "total_entries": 2235,
     "shard_breakdown": {
       "l.json": {
-        "entries": 91,
-        "file_size_bytes": 34134
+        "entries": 90,
+        "file_size_bytes": 34423
       },
       "u.json": {
-        "entries": 34,
-        "file_size_bytes": 13560
+        "entries": 48,
+        "file_size_bytes": 20051
       },
       "m.json": {
-        "entries": 120,
-        "file_size_bytes": 43783
+        "entries": 125,
+        "file_size_bytes": 47161
       },
       "x.json": {
         "entries": 3,
         "file_size_bytes": 924
       },
       "f.json": {
-        "entries": 87,
-        "file_size_bytes": 33530
+        "entries": 90,
+        "file_size_bytes": 36536
       },
       "others.json": {
         "entries": 58,
-        "file_size_bytes": 20291
+        "file_size_bytes": 21993
       },
       "i.json": {
-        "entries": 73,
-        "file_size_bytes": 26546
+        "entries": 76,
+        "file_size_bytes": 27858
       },
       "k.json": {
-        "entries": 13,
-        "file_size_bytes": 4621
+        "entries": 21,
+        "file_size_bytes": 8575
       },
       "c.json": {
-        "entries": 148,
-        "file_size_bytes": 57108
+        "entries": 143,
+        "file_size_bytes": 55277
       },
       "y.json": {
-        "entries": 27,
-        "file_size_bytes": 10038
+        "entries": 28,
+        "file_size_bytes": 11422
       },
       "w.json": {
-        "entries": 93,
-        "file_size_bytes": 33266
+        "entries": 97,
+        "file_size_bytes": 38258
       },
       "a.json": {
-        "entries": 147,
-        "file_size_bytes": 54471
+        "entries": 157,
+        "file_size_bytes": 59544
       },
       "r.json": {
-        "entries": 80,
-        "file_size_bytes": 30204
+        "entries": 79,
+        "file_size_bytes": 31878
       },
       "s.json": {
-        "entries": 206,
-        "file_size_bytes": 76817
+        "entries": 201,
+        "file_size_bytes": 77531
       },
       "z.json": {
-        "entries": 8,
-        "file_size_bytes": 3329
+        "entries": 11,
+        "file_size_bytes": 5025
       },
       "j.json": {
-        "entries": 23,
-        "file_size_bytes": 8025
+        "entries": 25,
+        "file_size_bytes": 9702
       },
       "d.json": {
-        "entries": 123,
-        "file_size_bytes": 46876
+        "entries": 113,
+        "file_size_bytes": 45265
       },
       "o.json": {
         "entries": 65,
-        "file_size_bytes": 24199
+        "file_size_bytes": 26397
       },
       "e.json": {
-        "entries": 98,
-        "file_size_bytes": 38003
+        "entries": 106,
+        "file_size_bytes": 42140
       },
       "t.json": {
-        "entries": 135,
-        "file_size_bytes": 49855
+        "entries": 140,
+        "file_size_bytes": 54737
       },
       "b.json": {
-        "entries": 102,
-        "file_size_bytes": 39273
+        "entries": 101,
+        "file_size_bytes": 40505
       },
       "h.json": {
-        "entries": 103,
-        "file_size_bytes": 35009
+        "entries": 104,
+        "file_size_bytes": 36546
       },
       "g.json": {
-        "entries": 98,
-        "file_size_bytes": 35434
+        "entries": 105,
+        "file_size_bytes": 38870
       },
       "p.json": {
-        "entries": 128,
-        "file_size_bytes": 46021
+        "entries": 139,
+        "file_size_bytes": 52891
       },
       "q.json": {
         "entries": 5,
-        "file_size_bytes": 1687
+        "file_size_bytes": 1749
       },
       "v.json": {
-        "entries": 26,
-        "file_size_bytes": 9461
+        "entries": 34,
+        "file_size_bytes": 13919
       },
       "n.json": {
         "entries": 71,
-        "file_size_bytes": 23931
+        "file_size_bytes": 24958
       }
     },
-    "analyzed_at": "2026-06-21T02:49:32.711623"
+    "analyzed_at": "2026-06-22T02:52:23.978696"
   }
 }
